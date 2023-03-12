@@ -126,17 +126,6 @@ public class EmployeeController : ControllerBase
         }
     }
 
-    //sort employees by salary
-    [HttpGet("SortEmployeesBySalaryDescending")]
-    public ActionResult<IEnumerable<Employee>> SortEmployeesBySalaryDescending()
-    {
-        var sortedEmployees = Context.Employees.OrderByDescending(e => e.Salary).ToList();
-        if (sortedEmployees == null)
-        {
-            return NotFound();
-        }
-        return Ok(sortedEmployees);
-}
 
 [HttpGet("GetEmployeeWithHighestSalary")]
 public async Task<ActionResult<Employee>> GetEmployeeWithHighestSalary()

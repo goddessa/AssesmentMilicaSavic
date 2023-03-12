@@ -1,16 +1,40 @@
-body {
-    display: flex;
-    flex-direction: column;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-    
-}
-
-.glavni-div
-{
-   
-}
-li {
+.glavni-div {
     display: block;
+    margin-bottom: 10px;
+  }
+  
+  form {
+    display: block;
+    background-color: #80ed99;
+    padding: 10px;
+  }
+  
+  form > div {
+    margin-bottom: 10px;
+  }
+  
+  input[type="button"] {
+    padding: 10px;
+    background-color: #219ebc;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .avg-div {
+    display: block;
+    background-color: #219ebc;
+    padding: 10px;
+    margin-top: 10px;
+  }
+  
+  .avg-button {
+    margin-bottom: 10px;
+  }
+  
+  .avg-button > input[type="button"] {
+    background-color: #fff;
+    color: #219ebc;
+    border: 2px solid #219ebc;
   }
   
