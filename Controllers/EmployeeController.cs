@@ -21,9 +21,19 @@ public class EmployeeController : ControllerBase
 
         try
         {
+            var existingEmployee = await Context.Employees
+            .FirstOrDefaultAsync(e => e.Email == employee.Email);
+
+            if (existingEmployee != null)
+            {
+                return BadRequest($"An employee with email '{employee.Email}' already exists.");
+            }
+             else
+            {
             await Context.Employees.AddAsync(employee);
             await Context.SaveChangesAsync();
             return Ok($"ID of new employee is: {employee.ID}");
+            }
         }
         catch(Exception e)
         {

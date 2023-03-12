@@ -10,9 +10,7 @@ public class Project
     public required string Description { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
-
-    public int EmployeeId { get; set; }
-    public Employee Employee { get; set; }
+    public IList<Task>? TaskList { get; set; }
 
 
 }

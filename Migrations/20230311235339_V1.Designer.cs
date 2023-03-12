@@ -12,8 +12,8 @@ using Models;
 namespace AssesmentMilicaSavic.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
-    [Migration("20230311184539_V2")]
-    partial class V2
+    [Migration("20230311235339_V1")]
+    partial class V1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,9 +67,6 @@ namespace AssesmentMilicaSavic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("EmployeeId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -81,8 +78,6 @@ namespace AssesmentMilicaSavic.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("EmployeeId");
 
                     b.ToTable("Projects");
                 });
@@ -129,34 +124,23 @@ namespace AssesmentMilicaSavic.Migrations
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("ProjectIdID")
+                    b.Property<int?>("EmployeeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IdProject")
                         .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("assigneID")
-                        .HasColumnType("int");
-
                     b.HasKey("ID");
 
-                    b.HasIndex("ProjectIdID");
+                    b.HasIndex("EmployeeId");
 
-                    b.HasIndex("assigneID");
+                    b.HasIndex("IdProject");
 
                     b.ToTable("Tasks");
-                });
-
-            modelBuilder.Entity("Models.Project", b =>
-                {
-                    b.HasOne("Models.Employee", "Employee")
-                        .WithMany()
-                        .HasForeignKey("EmployeeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
                 });
 
             modelBuilder.Entity("Models.ProjectStatistics", b =>
@@ -172,19 +156,27 @@ namespace AssesmentMilicaSavic.Migrations
 
             modelBuilder.Entity("Models.Task", b =>
                 {
-                    b.HasOne("Models.Project", "ProjectId")
-                        .WithMany()
-                        .HasForeignKey("ProjectIdID");
+                    b.HasOne("Models.Employee", "Assigne")
+                        .WithMany("Tasks")
+                        .HasForeignKey("EmployeeId");
 
-                    b.HasOne("Models.Employee", "assigne")
-                        .WithMany()
-                        .HasForeignKey("assigneID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("Models.Project", "Project")
+                        .WithMany("TaskList")
+                        .HasForeignKey("IdProject");
 
-                    b.Navigation("ProjectId");
+                    b.Navigation("Assigne");
 
-                    b.Navigation("assigne");
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Models.Employee", b =>
+                {
+                    b.Navigation("Tasks");
+                });
+
+            modelBuilder.Entity("Models.Project", b =>
+                {
+                    b.Navigation("TaskList");
                 });
 #pragma warning restore 612, 618
         }

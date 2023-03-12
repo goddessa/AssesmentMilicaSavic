@@ -14,8 +14,22 @@ public class EmployeeContext : DbContext
 
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
+{
+    base.OnModelCreating(modelBuilder);
+    modelBuilder.Entity<Employee>(e =>
     {
-        base.OnModelCreating(modelBuilder);
-      
-    }
+        e.HasMany<Task>(employee => employee.Tasks)
+        .WithOne(task => task.Assigne)
+        .HasForeignKey(task => task.EmployeeId);
+    });
+   modelBuilder.Entity<Project>(e =>
+    {
+        e.HasMany<Task>(project => project.TaskList)
+        .WithOne(task => task.Project)
+        .HasForeignKey(task => task.IdProject);
+    });
+
+        
+}
+
 }

@@ -12,5 +12,6 @@ public class Employee
     public required int Phone { get; set; }
     public DateTime DateOfBirth { get; set; }
     public int Salary { get; set; }
+    public IList<Task>? Tasks { get; set; }
 
 }

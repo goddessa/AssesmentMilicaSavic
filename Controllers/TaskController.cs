@@ -27,6 +27,11 @@ public class TaskController : ControllerBase
         }
         catch(Exception e)
         {
+            if (e.InnerException != null)
+            {
+        // log the inner exception or display its message
+                Console.WriteLine(e.InnerException.Message);
+            }
             return BadRequest(e.Message);
         }
     }
@@ -57,7 +62,7 @@ public class TaskController : ControllerBase
             {
                 oldTask.Title = task.Title;
                 oldTask.Description = task.Description;
-                oldTask.assigne = task.assigne;
+                oldTask.Assigne = task.Assigne;
                 oldTask.DueDate = task.DueDate;
                 Context.Tasks.Update(oldTask);
                 await Context.SaveChangesAsync();
@@ -99,22 +104,22 @@ public class TaskController : ControllerBase
     }
 
     //Top 5 employees who finished the tasks in past month
-/*[HttpGet("GetTopAssignees")]
-public ActionResult<IEnumerable<Employee>> GetTopAssignees()
-{
-    
-}*/
-//Finished tasks
-/*[HttpGet("tasks/finished")]
-public ActionResult<IEnumerable<Models.Task>> GetFinishedTasks()
-{
-    var finishedTasks = Conte.Tasks.Where(t => t.IsFinished == true).ToList();
 
-    if (finishedTasks == null || finishedTasks.Count == 0)
-    {
-        return NotFound("No finished tasks found.");
-    }
+[HttpGet("GetTopEmployees")]
+public async Task<ActionResult<IEnumerable<Employee>>> GetTopEmployees()
+{
+       var employees = await Context.Employees
+        .Include(e => e.Tasks)
+        .ToListAsync();
 
-    return finishedTasks;
-}*/
+    var topEmployees = employees.OrderByDescending(e => e.Tasks.Count)
+                               .Take(5);
+
+    return Ok(topEmployees);
 }
+
+
+
+}
+
+
