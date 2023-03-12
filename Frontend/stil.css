@@ -1,0 +1,16 @@
+body {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    
+}
+
+.glavni-div
+{
+   
+}
+li {
+    display: block;
+  }
+  

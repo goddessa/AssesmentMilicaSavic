@@ -79,7 +79,7 @@ public class ProjectController : ControllerBase
         }
     }
 
-    [HttpPut("UpdateProject/{projectID}")]
+    [HttpPut("UpdateProject/{projectId}")]
     public async Task<ActionResult> UpdateProject([FromBody]Project project, int projectId )
     {
         try
@@ -93,7 +93,7 @@ public class ProjectController : ControllerBase
                 oldProject.EndDate = project.EndDate;
                 Context.Projects.Update(oldProject);
                 await Context.SaveChangesAsync();
-                return Ok($"Id of changed task is : {projectId}");
+                return Ok($"Id of changed project is : {projectId}");
 
             }
             else
@@ -117,7 +117,7 @@ public class ProjectController : ControllerBase
             {
                 Context.Tasks.Remove(p);
                 await Context.SaveChangesAsync();
-                return Ok($"Id of deleted task is : {idProject}");
+                return Ok($"Id of deleted project is : {idProject}");
             }
             else
             {

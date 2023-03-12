@@ -15,12 +15,6 @@ export class Employee
 
 crtaj(host)
 {
-    /*Employee.prototype.crtaj = function(host){
-        if (!host) {
-          console.error('Invalid host element');
-          return;
-        }*/
-
    const glavniDiv = document.createElement("div");
    glavniDiv.classList.add("glavni-div");
    this.glavni = glavniDiv;
@@ -115,106 +109,194 @@ salary.appendChild(salaryOptions);
    button.type = "button";
    button.value = "Add Employee";
    dugmeDiv.appendChild(button);
-   
-   button.onclick = () => {
-    const fullName = nameLabel.value;
-    const email = emailLabel.value;
-    const phoneNumber = phoneLabel.value;
-    const dateOfBirth = dateInput.value;
-    const salary = salaryOptions.value;
-    
-    const employee = {
-      FullName: fullName,
+   //update
+   const updateDiv = document.createElement("div");
+    updateDiv.classList.add("update-div");
+    updateDiv.style.backgroundColor = "#219ebc";
+    formDiv.appendChild(updateDiv);
+
+    const update = document.createElement("label");
+    update.textContent = "ID for update:";
+    updateDiv.appendChild(update);
+
+    const updateLabel = document.createElement("input");
+    updateLabel.type="number";
+    update.appendChild(updateLabel);
+
+    const updateButton = document.createElement("div");
+    updateButton.classList.add("update-button");
+    updateDiv.appendChild(updateButton);
+
+    const updateEmployees = document.createElement("input");
+    updateEmployees.type = "button";
+    updateEmployees.value = "Update";
+    updateButton.appendChild(updateEmployees);
+
+    // get reference to the update button and input fields
+const updateId = updateLabel;
+const updateName = nameLabel;
+const updateEmail = emailLabel;
+const updatePhone = phoneLabel;
+const updateDate = dateInput;
+const updateSalary = salaryOptions;
+
+const updateEmployeesButton = updateEmployees;
+
+// add event listener for clicking the update button
+updateEmployeesButton.addEventListener("click", () => {
+  const id = updateId.value;
+  const fullName = updateName.value;
+  const email = updateEmail.value;
+  const phone = updatePhone.value;
+  const dateOfBirth = updateDate.value;
+  const salary = updateSalary.value;
+
+  // make sure all fields are filled out
+  if (!id || !fullName || !email || !phone || !dateOfBirth || !salary) {
+    alert("Please fill out all fields!");
+    return;
+  }
+
+  // make PUT request to server to update employee
+  fetch(`http://localhost:5261/Employee/UpdateEmployee/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      Name: fullName,
       Email: email,
-      PhoneNumber: phoneNumber,
+      PhoneNumber: phone,
       DateOfBirth: dateOfBirth,
       Salary: salary
-    };
-    
-    const url = 'http://localhost:5261/Employee/AddEmployee';
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(employee)
-    };
-    
-    fetch(url, options)
-      .then(response => {
-        if (response.ok) {
-          alert("Employee added successfully");
-        } else {
-          alert("Error adding employee");
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        alert("Error adding employee");
-      });
-  };
+    })
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      alert("Employee updated successfully!");
+      // clear input fields
+      updateId.value = "";
+      updateName.value = "";
+      updateEmail.value = "";
+      updatePhone.value = "";
+      updateDate.value = "";
+      updateSalary.selectedIndex = 0;
+    })
+    .catch(error => {
+      console.error("There was a problem with the fetch operation:", error);
+    });
+});
+
+   
   
-//Za izlistanje zaposlenih
-    const listDiv = document.createElement("div");
-    listDiv.classList.add("list-div");
-    listDiv.style.backgroundColor = "#219ebc";
-    glavniDiv.appendChild(listDiv);
+    //delete employees div
+    const deleteDiv = document.createElement("div");
+    deleteDiv.classList.add("delete-div");
+    deleteDiv.style.backgroundColor = "#cdb4db";
+    glavniDiv.appendChild(deleteDiv);
 
-    const getAllEmployeesButton = document.createElement("input");
-    getAllEmployeesButton.type = "button";
-    getAllEmployeesButton.value = "List all";
-    listDiv.appendChild(getAllEmployeesButton);
+    const deleteId = document.createElement("label");
+    deleteId.textContent = "ID for delete:";
+    deleteDiv.appendChild(deleteId);
+
+    const deleteLabel = document.createElement("input");
+    deleteLabel.type="number";
+    deleteId.appendChild(deleteLabel);
+
+    const deletButton = document.createElement("div");
+    deletButton.classList.add("delete-button");
+    deleteDiv.appendChild(deletButton);
+
+    const deleteEmployees = document.createElement("input");
+    deleteEmployees.type = "button";
+    deleteEmployees.value = "Delete";
+    deletButton.appendChild(deleteEmployees);
     
-    /*// Get the button and form elements from the DOM
-    getAllEmployeesButton = document.getElementById('getAllEmployeesButton');
 
-    const employeeListForm = document.createElement("div");
-    employeeListForm.classList.add("list-form");
-    listDiv.appendChild(employeeListForm);
-    employeeListForm = document.getElementById('employeeListForm');
-    getAllEmployeesButton.addEventListener('click', async () => {
-  // Send a GET request to the API endpoint
-    const response = await fetch('http://localhost:5261/Employee/GetEmployee');
-    const data = await response.json();
 
-  // Clear the form before adding new employee data
-    employeeListForm.innerHTML = '';
+const form = document.createElement("form");
+form.style.backgroundColor = "#80ed99";
+// Create the form elements
+const listButtonDiv = document.createElement("div");
+const listButton = document.createElement("input");
+listButton.type = "button";
+listButton.value = "List all employees";
+const employeeListDiv = document.createElement("div");
 
-  // Loop through the data and create a div element for each employee
-    data.forEach(employee => {
-    const employeeDiv = document.createElement('div');
-    employeeDiv.classList.add('employee');
-    listDiv.appendChild(employeeDiv);
-    const nameDiv = document.createElement('div');
-    nameDiv.classList.add('name');
-    nameDiv.innerHTML = `<span>Name:</span> ${employee.fullname}`;
-    employeeDiv.appendChild(nameDiv);
+// Add the button to the form
+listButtonDiv.appendChild(listButton);
+form.appendChild(listButtonDiv);
 
-    const emailDiv = document.createElement('div');
-    emailDiv.classList.add('email');
-    emailDiv.innerHTML = `<span>Email:</span> ${employee.email}`;
-    employeeDiv.appendChild(emailDiv);
+// Add the employee list to the form
+form.appendChild(employeeListDiv);
 
-    const phoneDiv = document.createElement('div');
-    phoneDiv.classList.add('phone');
-    phoneDiv.innerHTML = `<span>Phone:</span> ${employee.phone}`;
-    employeeDiv.appendChild(phoneDiv);
+// Add the form to the page
+document.body.appendChild(form);
 
-    const dobDiv = document.createElement('div');
-    dobDiv.classList.add('dob');
-    dobDiv.innerHTML = `<span>Date of Birth:</span> ${employee.dateOfBirth}`;
-    employeeDiv.appendChild(dobDiv);
+// Add a click event listener to the button
+listButton.addEventListener("click", async () => {
+  try {
+    const response = await fetch("http://localhost:5261/Employee/GetEmployee");
+    const employees = await response.json();
+    console.log(employees); // do something with the employees
 
-    const salaryDiv = document.createElement('div');
-    salaryDiv.classList.add('salary');
-    salaryDiv.innerHTML = `<span>Salary:</span> ${employee.salary}`;
-    employeeDiv.appendChild(salaryDiv);
+    // Create an unordered list to display the employees
+    const ul = document.createElement("ul");
 
-    employeeListForm.appendChild(employeeDiv);
-  });
-});*/
+    // Loop through the employees and add each one to the list
+    employees.forEach((employee) => {
+      const li = document.createElement("li");
+      li.style.display = "block";
+      li.textContent = `Name: ${employee.fullName}, Email: ${employee.email}, Phone: ${employee.phone}, Date of Birth: ${employee.dateOfBirth}, Salary: ${employee.salary}`;
+      ul.appendChild(li);
+    });
+
+    // Add the list to the page
+    employeeListDiv.innerHTML = "";
+    employeeListDiv.appendChild(ul);
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+
+  //Average salary display
+  const avgDiv = document.createElement("div");
+  avgDiv.classList.add("avg-div");
+  avgDiv.style.backgroundColor = "#219ebc"
+  glavniDiv.appendChild(avgDiv);
+
+  const avgButton = document.createElement("div");
+    avgButton.classList.add("avg-button");
+    avgDiv.appendChild(avgButton);
+
+    const avg = document.createElement("input");
+    avg.type = "button";
+    avg.value = "Average Salary";
+    avgButton.appendChild(avg);
+    //display ->>WORKS
+  // Add a click event listener to the button
+  avg.addEventListener("click", async () => {
+    try {
+    const response = await fetch("http://localhost:5261/Employee/GetAverageSalary");
+    const avgSalary = await response.json();
+    console.log(avgSalary); // do something with the average salary
+
+    // Display the average salary on the page
+    const avgSalaryDiv = document.createElement("div");
+    avgSalaryDiv.textContent = `The average salary is ${avgSalary}`;
+    avgDiv.appendChild(avgSalaryDiv);
+  } catch (error) {
+    console.error(error);
+  }
+});
 
     
+
+
+
 
 }
 

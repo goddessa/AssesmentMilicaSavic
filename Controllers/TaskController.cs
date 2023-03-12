@@ -52,7 +52,7 @@ public class TaskController : ControllerBase
         }
     }
 
-    [HttpPut("UpdateTask/{taskID}")]
+    [HttpPut("UpdateTask/{taskId}")]
     public async Task<ActionResult> UpdateTask([FromBody]Models.Task task, int taskId )
     {
         try
@@ -103,19 +103,133 @@ public class TaskController : ControllerBase
         }
     }
 
-    //Top 5 employees who finished the tasks in past month
-
-[HttpGet("GetTopEmployees")]
-public async Task<ActionResult<IEnumerable<Employee>>> GetTopEmployees()
-{
-       var employees = await Context.Employees
-        .Include(e => e.Tasks)
+//returns a list of Task IDs assigned to a specific employee with the given employeeId:
+    [HttpGet("GetTaskIdsByEmployeeId/{employeeId}/tasks")]
+    public async Task<ActionResult<List<int>>> GetTaskIdsByEmployeeId(int employeeId)
+    {
+    var tasks = await Context.Tasks
+        .Where(t => t.EmployeeId == employeeId)
+        .Select(t => t.ID)
         .ToListAsync();
 
-    var topEmployees = employees.OrderByDescending(e => e.Tasks.Count)
-                               .Take(5);
+    return tasks;
+    }
 
-    return Ok(topEmployees);
+//finished tasks
+    [HttpGet("GetFinishedExpiredTasks/expired")]
+    public IActionResult GetFinishedExpiredTasks()
+    {
+        var tasks = Context.Tasks
+        .Where(t => t.DueDate < DateTime.Now)
+        .ToList();
+        return Ok(tasks);
+    }
+
+//COUNT
+    [HttpGet("GetTasksByEmployeeId/{id}/tasks")]
+public IActionResult GetTasksByEmployeeId(int id)
+{
+    var employee = Context.Employees
+        .Include(e => e.Tasks)
+        .FirstOrDefault(e => e.ID == id);
+
+    if (employee == null)
+    {
+        return NotFound();
+    }
+
+    var tasks = employee.Tasks
+        .Where(t => t.DueDate < DateTime.Today)
+        .ToList();
+
+    var taskIds = tasks.Select(t => t.ID).ToList();
+    var taskCount = tasks.Count();
+
+    return Ok(new { TaskIds = taskIds, TaskCount = taskCount });
+}
+
+//all with finished tasks
+[HttpGet("GetEmployeesWithMostExpiredTasks")]
+public async Task<ActionResult<List<object>>> GetEmployeesWithMostExpiredTasks()
+{
+    var oneMonthAgo = DateTime.UtcNow.AddMonths(-1);
+    var tasks = await Context.Tasks.Where(t => t.DueDate < DateTime.UtcNow && t.DueDate > oneMonthAgo).ToListAsync();
+
+    var taskCountsByEmployeeId = tasks
+        .GroupBy(t => t.EmployeeId)
+        .ToDictionary(g => g.Key, g => g.Count());
+
+    if (taskCountsByEmployeeId.Count == 0)
+    {
+        // No tasks have been assigned, so return null or some default value
+        return NotFound();
+    }
+
+    var topEmployeesWithExpiredTasks = taskCountsByEmployeeId
+        .OrderByDescending(kv => kv.Value)
+        .Take(5)
+        .Select(kv => new
+        {
+            EmployeeId = kv.Key,
+            ExpiredTaskCount = kv.Value
+        })
+        .ToList();
+
+    return Ok(topEmployeesWithExpiredTasks);
+}
+
+//ALL WITH FINISHED TASKS
+[HttpGet("GetEmployeesWithMostFinished")]
+public async Task<ActionResult<List<object>>> GetEmployeesWithMostFinished()
+{
+    var tasks = await Context.Tasks.Where(t => t.DueDate < DateTime.UtcNow).ToListAsync();
+
+    var taskCountsByEmployeeId = tasks
+        .GroupBy(t => t.EmployeeId)
+        .ToDictionary(g => g.Key, g => g.Count());
+
+    if (taskCountsByEmployeeId.Count == 0)
+    {
+        // No tasks have been assigned, so return null or some default value
+        return NotFound();
+    }
+
+    var topEmployeeIdsWithTaskCounts = taskCountsByEmployeeId.OrderByDescending(kv => kv.Value).Take(5);
+
+    var results = new List<object>();
+    foreach (var kv in topEmployeeIdsWithTaskCounts)
+    {
+        results.Add(new
+        {
+            EmployeeId = kv.Key,
+            FinishedTaskCount = kv.Value
+        });
+    }
+
+    return Ok(results);
+}
+
+//AVERAGE NUMBER OF TASKS PER EMPLOYEE
+[HttpGet("GetAverageTasksPerEmployee")]
+public async Task<ActionResult<double>> GetAverageTasksPerEmployee()
+{
+    var tasks = await Context.Tasks.ToListAsync();
+
+    var taskCountsByEmployeeId = tasks
+        .GroupBy(t => t.EmployeeId)
+        .ToDictionary(g => g.Key, g => g.Count());
+
+    if (taskCountsByEmployeeId.Count == 0)
+    {
+        // No tasks have been assigned, so return null or some default value
+        return NotFound();
+    }
+
+    var totalTaskCount = taskCountsByEmployeeId.Values.Sum();
+    var employeeCount = taskCountsByEmployeeId.Keys.Count;
+    var averageTasksPerEmployee = (double)totalTaskCount / employeeCount;
+
+    return Ok(averageTasksPerEmployee);
 }
 
 
