@@ -8,8 +8,8 @@ public class Task
     public int ID { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
-    public Employee assigne { get; set; }
+    public Employee assigne { get; set; } //employee that has that task
     public DateTime DueDate { get; set; }
-    public Project? ProjectId { get; set; }
+    public Project? ProjectId { get; set; } //which project it belongs to
 
 }

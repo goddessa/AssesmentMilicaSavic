@@ -7,6 +7,7 @@ public class EmployeeContext : DbContext
     public required DbSet<Employee> Employees { get; set; }
     public required DbSet<Task> Tasks { get; set; }
     public required DbSet<Project> Projects { get; set; }
+    public required DbSet<ProjectStatistics> Statistics { get; set; }
 
     public EmployeeContext(DbContextOptions options) : base(options)
     {

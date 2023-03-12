@@ -19,24 +19,10 @@ public class ProjectController : ControllerBase
     }
 
     //CRUD for Project
-    /*[HttpPost("AddProject")]
-    public async Task<ActionResult> AddProject([FromBody] Project project)
-    {
-        try
-        {
-            await Context.Projects.AddAsync(project);
-            await Context.SaveChangesAsync();
-            return Ok($"ID of added project is : {project.ID}");
-
-        }
-        catch(Exception e)
-        {
-            return BadRequest(e.Message);
-        }
-    }*/
+    
 
     //first retrieves the employee from the database using the FindAsync method, and throws an exception if the employee is not found.
-    [HttpPost]
+    /*[HttpPost]
     public async Task<IActionResult> AddProject([FromBody] Project project)
     {
         try
@@ -59,7 +45,22 @@ public class ProjectController : ControllerBase
     {
         return StatusCode(500, $"Internal server error: {ex}");
     }
-}
+}*/
+    [HttpPost("AddProject")]
+    public async Task<ActionResult> AddProject([FromBody]Project project)
+    {
+
+        try
+        {
+            await Context.Projects.AddAsync(project);
+            await Context.SaveChangesAsync();
+            return Ok($"ID of new project is: {project.ID}");
+        }
+        catch(Exception e)
+        {
+            return BadRequest(e.Message);
+        }
+    }
 
 
 

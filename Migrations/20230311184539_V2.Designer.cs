@@ -12,8 +12,8 @@ using Models;
 namespace AssesmentMilicaSavic.Migrations
 {
     [DbContext(typeof(EmployeeContext))]
-    [Migration("20230311171554_V1")]
-    partial class V1
+    [Migration("20230311184539_V2")]
+    partial class V2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -67,7 +67,7 @@ namespace AssesmentMilicaSavic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("EmployeeIdID")
+                    b.Property<int>("EmployeeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EndDate")
@@ -82,9 +82,36 @@ namespace AssesmentMilicaSavic.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("EmployeeIdID");
+                    b.HasIndex("EmployeeId");
 
                     b.ToTable("Projects");
+                });
+
+            modelBuilder.Entity("Models.ProjectStatistics", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CompletedTasks")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IncompleteTasks")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ProjectId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TotalTasks")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProjectId");
+
+                    b.ToTable("Statistics");
                 });
 
             modelBuilder.Entity("Models.Task", b =>
@@ -109,7 +136,7 @@ namespace AssesmentMilicaSavic.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("assigneID")
+                    b.Property<int>("assigneID")
                         .HasColumnType("int");
 
                     b.HasKey("ID");
@@ -123,11 +150,24 @@ namespace AssesmentMilicaSavic.Migrations
 
             modelBuilder.Entity("Models.Project", b =>
                 {
-                    b.HasOne("Models.Employee", "EmployeeId")
+                    b.HasOne("Models.Employee", "Employee")
                         .WithMany()
-                        .HasForeignKey("EmployeeIdID");
+                        .HasForeignKey("EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("EmployeeId");
+                    b.Navigation("Employee");
+                });
+
+            modelBuilder.Entity("Models.ProjectStatistics", b =>
+                {
+                    b.HasOne("Models.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Project");
                 });
 
             modelBuilder.Entity("Models.Task", b =>
@@ -138,7 +178,9 @@ namespace AssesmentMilicaSavic.Migrations
 
                     b.HasOne("Models.Employee", "assigne")
                         .WithMany()
-                        .HasForeignKey("assigneID");
+                        .HasForeignKey("assigneID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ProjectId");
 

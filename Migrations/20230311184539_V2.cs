@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace AssesmentMilicaSavic.Migrations
 {
     /// <inheritdoc />
-    public partial class V1 : Migration
+    public partial class V2 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,16 +38,39 @@ namespace AssesmentMilicaSavic.Migrations
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     EndDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    EmployeeIdID = table.Column<int>(type: "int", nullable: true)
+                    EmployeeId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Projects", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_Projects_Employees_EmployeeIdID",
-                        column: x => x.EmployeeIdID,
+                        name: "FK_Projects_Employees_EmployeeId",
+                        column: x => x.EmployeeId,
                         principalTable: "Employees",
-                        principalColumn: "ID");
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Statistics",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    TotalTasks = table.Column<int>(type: "int", nullable: false),
+                    CompletedTasks = table.Column<int>(type: "int", nullable: false),
+                    IncompleteTasks = table.Column<int>(type: "int", nullable: false),
+                    ProjectId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Statistics", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Statistics_Projects_ProjectId",
+                        column: x => x.ProjectId,
+                        principalTable: "Projects",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -58,7 +81,7 @@ namespace AssesmentMilicaSavic.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    assigneID = table.Column<int>(type: "int", nullable: true),
+                    assigneID = table.Column<int>(type: "int", nullable: false),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ProjectIdID = table.Column<int>(type: "int", nullable: true)
                 },
@@ -69,7 +92,8 @@ namespace AssesmentMilicaSavic.Migrations
                         name: "FK_Tasks_Employees_assigneID",
                         column: x => x.assigneID,
                         principalTable: "Employees",
-                        principalColumn: "ID");
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_Tasks_Projects_ProjectIdID",
                         column: x => x.ProjectIdID,
@@ -78,9 +102,14 @@ namespace AssesmentMilicaSavic.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Projects_EmployeeIdID",
+                name: "IX_Projects_EmployeeId",
                 table: "Projects",
-                column: "EmployeeIdID");
+                column: "EmployeeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Statistics_ProjectId",
+                table: "Statistics",
+                column: "ProjectId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tasks_assigneID",
@@ -96,6 +125,9 @@ namespace AssesmentMilicaSavic.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "Statistics");
+
             migrationBuilder.DropTable(
                 name: "Tasks");
 
